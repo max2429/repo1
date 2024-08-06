@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import gzip, glob, os, time, re, argparse, json
+import gzip
+import glob
+import os
+import time
+import re
+import argparse
+import json
 from datetime import datetime
 from dateutil import parser
 from pathlib import Path
 from collections import OrderedDict
 from string import Template
-import logging, sys, traceback, mmap
+import logging
+import sys
+import traceback
+import mmap
 
 
 class LogAnalyzer:
@@ -48,7 +57,6 @@ class LogAnalyzer:
       elif config["LOG_LEVEL"] == "ERROR":
          loglev = logging.ERROR
 
-      print("config log_file={0}".format(config["LOG_FILE"]))
       file_handler = logging.FileHandler("{0}/{1}.log".format(config["LOG_DIR"],config["LOG_FILE"]))
       stdout_handler = logging.StreamHandler(stream=sys.stdout)
       if config["LOG_FILE"]:
@@ -93,13 +101,13 @@ class LogAnalyzer:
        args = parser.parse_args()
        configpath = args.config
    
-       if configpath != None:
+       if configpath is not None:
          config_file = Path(configpath)
          if config_file.is_file():
-            logging.info("arg config file exists!")
+            #logging.info(f"arg config file {config_file} exists")
             return config_file
          else:
-            logger.warning(f'Configuration file: {config_file} - does not exist')
+            logging.warning(f'Input configuration file {config_file} does not exist')
        return None
 
 
@@ -109,35 +117,35 @@ class LogAnalyzer:
 
       """
       input_file = self.inputarg()
-      '''if not os.path.exists(input_file):
-          logging.warning(f'Configuration file: {input_file} - does not exist')
-          return {}
-      '''
 
       if input_file:
          config_file = input_file
       elif Path("./config").is_file():
          config_file = Path("./config")
-      else: 
+      else:
+         logging.info("No config file provided. Using next default values defined in program:\n")
+         for k,v in self.config.items():
+           print(f"{k}:{v}")
+         print("\n",end='')
          return
       d = {}
       with open(config_file,'r') as f:
          for line in f:
-            print(f"{line}")
             tpl = line.split(':')
             tpl[0] = tpl[0].strip().strip('"')
             tpl[1] = tpl[1].strip().strip('"')
             d[tpl[0]] = tpl[1]
+      #print('\n')
       for k, v in d.items():
          for k2, v2 in self.config.items():
             if k == k2:
-               print("ok1")
                self.config[k2]=v
-   
+      logging.info(f"Config file provided is: {config_file}. Using next values from it:\n")
       for k,v in self.config.items():
-         print(f"!!k={k} v={v}")
-   
-   
+         print(f"{k}:{v}")
+      print("\n",end='')
+
+
    def getlatestlog(self,config):
       """
       search for latest log file
@@ -146,7 +154,6 @@ class LogAnalyzer:
       returns: latestlog
       """
 
-      self.getconfig()
       list_of_files = glob.glob(config["INPUTLOG_DIR"] + "/*")
 
       filedt = datetime.strptime('19700101','%Y%m%d')
@@ -154,7 +161,6 @@ class LogAnalyzer:
          filename = s.split('/')[2]
          if "nginx" in filename:
             match = re.search('\d{8}', s)
-            #print(match.group(0))
             dt = match.group(0)
             dt_obj = parser.parse(dt)
             if filedt < dt_obj:
@@ -162,39 +168,56 @@ class LogAnalyzer:
                latestlog = s
 
       logging.info(f"filedt={filedt}, latestlog={latestlog}")
-      #logging.error("some error occured")
-      #logging.debug("this is debug info")
 
       return latestlog
    
-   
-   def parselog(self,config):
+
+
+   def getlinelist(self,config):
       """
-      parse log file
+      get list of lines
 
       param: config dict
-      returns: reportlist
+      returns: linelist
       """
       logfile = self.getlatestlog(self.config)
       opener = gzip.open if ".gz" in logfile else open
       cnt = 0
       linelist, wordlist = [], []
+      
+      try:
+         with opener(logfile,'r') as file1:
+            logging.info("Processing data...")
+            for line in file1:
+               cnt+=1
+               wordlist = line.split()
+               linelist.append(wordlist)            
+      except (FileNotFoundError, PermissionError, OSError):
+          logging.exception(f"Error opening file {file1}")
+
+      return linelist
+
+
+   def getreportlist(self,config):
+      """
+      get list of reports
+
+      param: config dict
+      returns: reportlist
+      """
       urldict = {}
       urllist = []
       maxtimedict = {}
       timesumdict = {}
       avgtimedict = {}
       timedict = {}   
-   
-      with opener(logfile,'r') as file1:
-         for line in file1:
-            cnt+=1
-            wordlist = line.split()
-            linelist.append(wordlist)            
+
+      linelist = []
+      linelist = self.getlinelist(self.config)
 
       allreqcnt = 0
       alltime = 0
-      allgetcnt = 0
+
       for el in linelist:
          if "GET" in str(el):
            allreqcnt += 1
@@ -206,7 +229,7 @@ class LogAnalyzer:
                 if el2 not in urldict:
                    urldict[el2] = 1
                 else:
-                   urldict[el2] += 1;
+                   urldict[el2] += 1
                 if el2 not in timesumdict:
                    timesumdict[el2] = float(el[-1])
                 else:
@@ -220,9 +243,10 @@ class LogAnalyzer:
                    timedict[el2] = el[-1].decode("utf-8") + '\t'
                 else:
                    timedict[el2] = timedict[el2] + '\t' + el[-1].decode("utf-8")   
-      cnt1=0   
-      maxtime=0
+
+      cnt1=0
       reportlist = []
+
       for url,urlcnt in urldict.items():
             cnt1+=1
             avgtimedict[url] = timesumdict[url]/float(urlcnt)
@@ -237,8 +261,6 @@ class LogAnalyzer:
             else:
                med = (float(timelist[int(timelistlen/2)-1]) + float(timelist[int(timelistlen/2)]))/2
    
-            if cnt1 == len(urldict):
-               print(f"!!!!!cnt1={cnt1}")
             r = self.ReportItem()
             r.id = cnt1
             r.count = urlcnt
@@ -260,7 +282,7 @@ class LogAnalyzer:
       param: config dict
       returns: jsonstr
       """
-      rlist = self.parselog(config)
+      rlist = self.getreportlist(config)
       cnt11=0
       dict1 = ()
       jsonstr = json.dumps(dict1,ensure_ascii=False)
@@ -272,7 +294,6 @@ class LogAnalyzer:
          ("time_sum",str(i.time_sum)),("url",str(i.url)),\
          ("time_med",str(i.time_med)),("time_perc",str(i.time_perc)),("count_perc",str(i.count_perc)))
          b1 = OrderedDict(a1)
-         json_str = json.dumps(b1, separators=(',',':')) 
          jsonobj.append(b1)
       jsonstr = json.dumps(jsonobj,ensure_ascii=False,indent=None,separators=(',',':'))
 
@@ -307,17 +328,20 @@ class LogAnalyzer:
 def main():
    la = LogAnalyzer()
    la.tmstart()
-   
    try:
+      la.setlogger(la.config)
       la.getconfig()
       currdir = os.getcwd()
+
       logdir = os.path.join(currdir, la.config["LOG_DIR"])
       reportdir = os.path.join(currdir, la.config["REPORT_DIR"])
+
       os.makedirs(logdir, exist_ok=True)
       os.makedirs(reportdir, exist_ok=True)
-      la.setlogger(la.config)
+
       ts = str(datetime.now().strftime("%Y_%m_%d_%H%M%S"))
       resfile = la.config["REPORT_DIR"] + "/report_" + ts +".html"
+
       if os.path.exists(resfile):
          os.remove(resfile)
       jsonstr = la.createjson(la.config)
@@ -325,10 +349,20 @@ def main():
       if la.makereport(jsonstr,resfile):
           logging.info("Successfully finished")
       la.tmstop()
+
+
    except Exception:
       ex_str = traceback.format_exc()
       logging.exception(f'Exception occured: {ex_str}')
-      
+
 
 if __name__ == "__main__":
-    main()
+   try:
+      main()
+
+   except KeyboardInterrupt:
+        print('\ninterrupted')
+        try:
+            sys.exit(130)
+        except SystemExit:
+            os._exit(130)
