@@ -1,0 +1,74 @@
+{% load static %}
+{% load timetags %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{% static 'askme/css/bootstrap.min.css' %}">
+    <title>Hasker</title>
+</head>
+<body>
+    <div class="container">
+
+        <nav class="navbar navbar-light bg-light">
+            <a class="navbar-brand" href="{% url 'askme:index' %}">Hasker</a>
+            <form action="{% url 'askme:search' %}" method="get" class="form-inline" accept-charset="utf-8">
+                <div class="input-group">
+                    <input class="form-control" type="text" aria-label="Search" name="q" placeholder="Text or tag name..." value="{% if search_query %}{{ search_query }}{% endif %}">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
+            {% if user.is_authenticated %}
+                <div class="navbar-nav ml-auto">
+                    {% if user.photo %}
+                        <img src="{{ user.photo.url }}" alt="User photo" height="50">
+                    {% else %}
+                        <img src="{% static 'askme/img/default-user.jpg' %}" alt="Default user" height="50">
+                    {% endif %}
+                    <a href="{% url 'hasker_user:settings' %}">{{ user.username }}</a>
+                    <a href="{% url 'hasker_user:logout' %}">
+                        <img src="{% static 'askme/img/exit.png' %}" alt="Logout" height="50">
+                    </a>
+                </div>
+            {% else %}
+                <div>
+                    <a class="btn btn-secondary" href="{% url 'hasker_user:login' %}">Log In</a>
+                    <a class="btn btn-secondary" href="{% url 'hasker_user:signup' %}" role="button">Sign Up</a>
+                </div>
+            {% endif %}
+        </nav>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-sm-10">
+                {% block content %}
+                {% endblock content %}
+            </div>
+            <div class="col">
+                {% if user.is_authenticated and not hide_ask_btn %}
+                    <a class="btn btn-secondary btn-block" role="button" href="{% url 'askme:ask' %}">Ask</a>
+                {% endif %}
+                <br>
+                <h2>Trending</h2>
+                {% for top in top_questions %}
+                    <p>
+                        <a href="{% url 'askme:question' top.slug %}" class="badge badge-primary">{{ top.votes }}</a>
+                        {{ top.title }}
+                    </p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'askme/js/jquery-3.2.1.slim.min.js' %}"></script>
+    <script src="{% static 'askme/js/bootstrap.bundle.min.js' %}"></script>
+
+    {% block script %}
+    {% endblock script %}
+</body>
+</html>

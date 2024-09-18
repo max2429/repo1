@@ -1,0 +1,132 @@
+{% extends "askme/base.html" %}
+
+{% block content %}
+{#  Вопрос  #}
+    <h4>{{ question.title }}</h4>
+    <div class="row">
+        <div class="col col-md-1">
+            <div onclick="vote('question','up',{{ question.pk }},this)">+</div>
+            <div class="votes">{{ question.votes }}</div>
+            <div onclick="vote('question','down',{{ question.pk }},this)">-</div>
+        </div>
+        <div class="col">{{ question.text }}</div>
+    </div>
+    <div class="row">
+        <div class="col col-md-1"></div>
+        <div class="col">
+            {% for tag in question.tags.all %}
+                <a class="badge badge-primary" role="button" href="{% url 'askme:search_tag' tag.name %}">{{ tag.name }}</a>
+            {% endfor %}
+        </div>
+        <div class="col col-md-2">
+            <img src="{{ question.user.photo_url }}" alt="" height="30px">
+            <span>{{ question.user.username }}</span>
+        </div>
+    </div>
+    <hr>
+
+{#    Ответы  #}
+    {% for answer in answers %}
+        <div class="row">
+            <div class="col col-md-1">
+                <div class="answer-vote-up" onclick="vote('answer', 'up', {{ answer.pk }}, this)">+</div>
+                <div class="votes">{{ answer.votes }}</div>
+                <div class="answer-vote-down" onclick="vote('answer', 'down', {{ answer.pk }}, this)">-</div>
+                {% if request.user == answer.question.user %}
+                    <div onclick="set_correct_answer({{ answer.pk }}, this)">SET</div>
+                {% endif %}
+            </div>
+            <div class="col">{{ answer.text }}</div>
+        </div>
+        <div class="row">
+            <div class="col col-md-1"></div>
+            <div class="col"></div>
+            <div class="col col-md-2">
+                <img src="{{ answer.user.photo_url }}" alt="" height="30px">
+                <span>{{ answer.user.username }}</span>
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
+
+    {% include "askme/paging.html" with list_page=answers %}
+
+{#    Добавить ответ   #}
+    {% if user.is_authenticated %}
+        <h4>Your answer</h4>
+        <div class="row">
+            <div class="col col-md-1"></div>
+            <div class="col">
+                <form action="{% url 'askme:answer_create' question.slug %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="answerForm">Your Answer</label>
+                        <textarea class="form-control" name="text" id="answerForm" rows="10" required></textarea>
+                    </div>
+                    <button class="btn btn-secondary" type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <p>You need to <a href="{% url 'login' %}">log in</a> to post answers.</p>
+    {% endif %}
+{% endblock content %}
+
+{% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    var csrftoken = getCookie('csrftoken');
+    var apiURL = {
+        answer: {
+            up: '/api_common/answer/voteup/',
+            down: '/api_common/answer/votedown/',
+            set_correct: '/api_common/answer/setcorrect/'
+        },
+        question: {
+            up: '/api_common/question/voteup/',
+            down: '/api_common/question/votedown/'
+        }
+    };
+
+    function vote(subject, up_or_down, id, elem) {
+        var url = apiURL[subject][up_or_down] + id + '/';
+        $.post({
+            url: url,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+                $(elem).siblings('.votes').text(data.votes);
+            }
+        });
+    }
+
+    function set_correct_answer(id, elem) {
+        var url = apiURL['answer']['set_correct'] + id + '/';
+        $.post({
+            url: url,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+                $(elem).text('TRUE');
+            }
+        });
+    }
+</script>
+{% endblock script %}

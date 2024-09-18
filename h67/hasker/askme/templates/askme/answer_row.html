@@ -1,0 +1,28 @@
+{% load timetags %}
+{% load custom_filters %}
+
+
+<div class="row">
+    <div class="col text-center">
+        <h6>{{ question.votes }}</h6>
+        <p>Votes</p>
+    </div>
+    <div class="col text-center">
+        <h6>{{ question.answer_set.count }}</h6>
+        <p>Answers</p>
+    </div>
+    <div class="col-sm-4">
+        <a href="{% url 'askme:question' question.slug %}">{{ question.title }}</a>
+        <br>
+        {% for tag in question.tags.all %}
+            <a href="{% url 'askme:search_tag' tag_name=tag.name %}">{{ tag.name }}</a>
+        {% endfor %}
+    </div>
+    <div class="col col-sm-4">
+        <img src="{{ question.user.photo_url }}" alt="" height="30px">
+        <span>{{ question.user.username }}</span>
+         <div>Asked {{ question.date_pub|minsince }} days ago</div>
+        <!-- <div>Asked {{ question.date_pub }} now is: {% now "Y-m-d G:i:s" %}</div> -->
+    </div>
+</div>
+<hr>
