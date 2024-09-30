@@ -1,4 +1,4 @@
-## Logical regression
+## Logistic regression
 
 virtualenv newenv
 source newenv/bin/activate
