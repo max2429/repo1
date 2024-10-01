@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en-gb">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="https://simonwillison.net/2024/Oct/1/openai-devday-2024-live-blog/">
+<title>OpenAI DevDay 2024 live blog</title>
+<script defer data-domain="simonwillison.net" src="https://plausible.io/js/plausible.js"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-1090368-1"></script>
+<script>
+window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments)}; gtag('js', new Date());gtag('config', 'UA-1090368-1', {send_page_view: false });
+(function() {
+    var m = /#atom\-(\w+)/.exec(location.hash);
+    if (m) {
+        gtag('event', 'page_view', {dimension1: m[1]});
+        history.replaceState && history.replaceState(null, '', location.href.split('#')[0]);
+    } else {
+        gtag('event', 'page_view');
+    }
+})();
+</script>
+
+<link rel="alternate" type="application/atom+xml" title="Atom" href="/atom/everything/">
+<link rel="stylesheet" type="text/css" href="/static/css/all.css">
+<link rel="webmention" href="https://webmention.io/simonwillison.net/webmention">
+<link rel="pingback" href="https://webmention.io/simonwillison.net/xmlrpc">
+
+
+
+<meta name="twitter:card" content="summary">
+
+<meta name="twitter:creator" content="@simonw">
+<meta property="og:url" content="https://simonwillison.net/2024/Oct/1/openai-devday-2024-live-blog/">
+<meta property="og:title" content="OpenAI DevDay 2024 live blog">
+
+<meta property="og:type" content="article">
+<meta property="og:description" content="I’m at OpenAI DevDay in San Francisco, and I’m trying something new: a live blog, where this entry will be updated with new notes during the event.">
+<meta property="og:updated_time" content="1727803033">
+
+
+<script>
+function pollUpdates() {
+  fetch('/updates/8523/')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('live-updates').innerHTML = html;
+    })
+    .catch(error => {
+      console.error('Error fetching updates:', error);
+    })
+    .finally(() => {
+      setTimeout(pollUpdates, 5000);
+    });
+}
+
+// Start polling
+pollUpdates();
+</script>
+<script async src="https://media.ethicalads.io/media/client/ethicalads.min.js"></script>
+
+
+</head>
+<body class="smallhead">
+
+<div id="smallhead">
+  <div id="smallhead-inner">
+    <h1><a href="/">Simon Willison’s Weblog</a></h1>
+    <a id="smallhead-about" href="/about/#subscribe">Subscribe</a>
+  </div>
+</div><!-- #smallhead -->
+
+<div id="wrapper">
+<div id="primary">
+
+<div class="entry entryPage">
+
+
+<div data-permalink-context="/2024/Oct/1/openai-devday-2024-live-blog/">
+<h2>OpenAI DevDay 2024 live blog</h2>
+<p class="mobile-date">1st October 2024</p>
+
+
+
+<p>I’m at OpenAI DevDay in San Francisco, and I’m trying something new: a live blog, where this entry will be updated with new notes during the event.</p>
+
+
+<div id="live-updates">
+
+<p><strong>10:19</strong> The keynote is starting with a review of o1, and some examples of applications that use it.</p>
+
+<p><strong>10:30</strong> They started with some demos of o1 being used in applications, and announced that the rate limit for o1 doubled to 10000 RPM (from 5000 RPM) - same as GPT-4 now.</p>
+
+<p><strong>10:31</strong> The first big announcement: a realtime API, providing the ability to use WebSockets to implement voice input and output against their models.</p>
+
+<p><strong>10:33</strong> What can you build with the new realtime API? The demonstrated an updated version of their Wanderlust travel agent demo. The demo uses voice as both input and output.</p>
+
+</div>
+
+</div>
+<div class="entryFooter">Posted <a href="/2024/Oct/1/">1st October 2024</a> at 5:17 pm &middot; Follow me on <a href="https://fedi.simonwillison.net/@simon">Mastodon</a> or <a href="https://twitter.com/simonw">Twitter</a> or <a href="https://simonwillison.net/about/#subscribe">subscribe to my newsletter</a></div>
+
+</div>
+
+<div class="recent-articles">
+<h2>More recent articles</h2>
+<ul class="bullets">
+  
+    <li><a href="/2024/Sep/30/weeknotes/">Weeknotes: Three podcasts, two trips and a new plugin system</a> - 30th September 2024</li>
+  
+    <li><a href="/2024/Sep/29/notebooklm-audio-overview/">NotebookLM&#x27;s automatically generated podcasts are surprisingly effective</a> - 29th September 2024</li>
+  
+</ul>
+</div>
+
+
+</div> <!-- #primary -->
+
+<div id="secondary">
+
+<div class="metabox">
+<p class="this-is">This is <strong>OpenAI DevDay 2024 live blog</strong> by Simon Willison, posted on <a href="/2024/Oct/1/">1st October 2024</a>.</p>
+
+
+    
+        <a class="item-tag" href="/tags/blogging/" rel="tag">
+            blogging
+            <span>58</span>
+        </a>
+    
+        <a class="item-tag" href="/tags/ai/" rel="tag">
+            ai
+            <span>814</span>
+        </a>
+    
+        <a class="item-tag" href="/tags/openai/" rel="tag">
+            openai
+            <span>193</span>
+        </a>
+    
+        <a class="item-tag" href="/tags/generative-ai/" rel="tag">
+            generative-ai
+            <span>687</span>
+        </a>
+    
+        <a class="item-tag" href="/tags/llms/" rel="tag">
+            llms
+            <span>678</span>
+        </a>
+    
+
+
+
+<p><strong>Previous:</strong> <a href="/2024/Sep/30/weeknotes/">Weeknotes: Three podcasts, two trips and a new plugin system</a></p>
+
+<div data-ea-publisher="simonwillisonnet" data-ea-type="image"></div>
+</div>
+
+
+
+</div> <!-- #secondary -->
+</div> <!-- #wrapper -->
+
+
+
+
+
+
+
+
+
+
+
+<div id="ft">
+    <ul>
+      <li><a href="/about/#about-site">Colophon</a></li>
+      <li>&copy;</li>
+      <li><a href="/2002/">2002</a></li>
+      <li><a href="/2003/">2003</a></li>
+      <li><a href="/2004/">2004</a></li>
+      <li><a href="/2005/">2005</a></li>
+      <li><a href="/2006/">2006</a></li>
+      <li><a href="/2007/">2007</a></li>
+      <li><a href="/2008/">2008</a></li>
+      <li><a href="/2009/">2009</a></li>
+      <li><a href="/2010/">2010</a></li>
+      <li><a href="/2011/">2011</a></li>
+      <li><a href="/2012/">2012</a></li>
+      <li><a href="/2013/">2013</a></li>
+      <li><a href="/2014/">2014</a></li>
+      <li><a href="/2015/">2015</a></li>
+      <li><a href="/2016/">2016</a></li>
+      <li><a href="/2017/">2017</a></li>
+      <li><a href="/2018/">2018</a></li>
+      <li><a href="/2019/">2019</a></li>
+      <li><a href="/2020/">2020</a></li>
+      <li><a href="/2021/">2021</a></li>
+      <li><a href="/2022/">2022</a></li>
+      <li><a href="/2023/">2023</a></li>
+      <li><a href="/2024/">2024</a></li>
+    </ul>
+</div>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('h4[id],h5[id],h6[id]').forEach(el => {
+    const id = el.getAttribute('id');
+    const permalinkContext = el.closest('[data-permalink-context]');
+    if (permalinkContext) {
+      const url = permalinkContext.getAttribute('data-permalink-context');
+      const hashLink = document.createElement('a');
+      hashLink.style.borderBottom = 'none';
+      hashLink.style.color = '#666';
+      hashLink.style.fontSize = '1em';
+      hashLink.style.opacity = 0.8;
+      hashLink.setAttribute('href', url + '#' + id);
+      hashLink.innerText = '#';
+      el.appendChild(document.createTextNode(' '));
+      el.appendChild(hashLink);
+    }
+  });
+});
+</script>
+</body>
+</html>
