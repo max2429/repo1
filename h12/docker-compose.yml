@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  memcached:
+    image: memcached:1.5-alpine
+    ports:
+      - 33013:33013
+      - 33014:33014
+      - 33015:33015
+      - 33016:33016
+    command: ["memcached", "-l", "0.0.0.0:33013,0.0.0.0:33014,0.0.0.0:33015,0.0.0.0:33016"]
+
+  loader:
+    build: .
+    volumes:
+      - ./data:/data
+    restart: on-failure
+    depends_on:
+      - memcached
